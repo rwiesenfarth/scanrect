@@ -34,7 +34,7 @@
 
 RWScanImageModel::RWScanImageModel( QObject *parent )
   : QAbstractListModel( parent )
-  , m_pImageList( new RWScanImageList )
+  , m_imageList()
   , m_nullImageBrush( QColor( 128, 128, 128 ) )
   , m_nullImageFont()
 {
@@ -43,21 +43,24 @@ RWScanImageModel::RWScanImageModel( QObject *parent )
 
 
 //=================================================================================================================
-const RWScanImageEntry &RWScanImageModel::entry(const QModelIndex &index) const
+std::shared_ptr<RWScanImageEntry> RWScanImageModel::itemAt( const QModelIndex &index ) const
 {
-  //! \todo Add error handling (return ref to invalid object)
-  return m_pImageList->at( index.row() );
+  if( index.isValid() && ( index.column() == 0 ) && ( index.row() <= m_imageList.size() ) )
+  {
+    return m_imageList.at( index.row() );
+  }
+  return std::shared_ptr<RWScanImageEntry>();
 }
 
 
 //=================================================================================================================
 void RWScanImageModel::addImages(const QStringList &imageList)
 {
-  beginInsertRows( QModelIndex(), m_pImageList->count(), m_pImageList->count() + imageList.count() + 1 );
+  beginInsertRows( QModelIndex(), (int) m_imageList.size(), (int) m_imageList.size() + imageList.count() + 1 );
 
   for( int i = 0; i < imageList.count(); i++ )
   {
-    m_pImageList->append( RWScanImageEntry( imageList[i] ) );
+    m_imageList.push_back( std::make_shared<RWScanImageEntry>( imageList[i] ) );
   }
 
   endInsertRows();
@@ -67,35 +70,35 @@ void RWScanImageModel::addImages(const QStringList &imageList)
 //=================================================================================================================
 int RWScanImageModel::rowCount( const QModelIndex & /*parent*/ ) const
 {
-  return m_pImageList->count();
+  return (int) m_imageList.size();
 }
 
 
 //=================================================================================================================
 QVariant RWScanImageModel::data( const QModelIndex &index, int role ) const
 {
-  if( !index.isValid() || ( index.column() != 0 ) )
+  if( !index.isValid() || ( index.column() != 0 ) || ( index.row() >= (int) m_imageList.size() ) )
   {
     return QVariant();
   }
 
-  auto image = m_pImageList->at( index.row() );
+  auto image = m_imageList.at( index.row() );
 
   if( role == Qt::DisplayRole )
   {
-    return image.name();
+    return image->name();
   }
   else if( role == Qt::ToolTipRole )
   {
-    return image.filename();
+    return image->filename();
   }
   else if( role == Qt::ForegroundRole )
   {
-    return image.image().isNull() ? m_nullImageBrush : QVariant();
+    return image->image().isNull() ? m_nullImageBrush : QVariant();
   }
   else if( role == Qt::FontRole )
   {
-    return image.image().isNull() ? m_nullImageFont : QVariant();
+    return image->image().isNull() ? m_nullImageFont : QVariant();
   }
 
   return QVariant();
@@ -117,7 +120,7 @@ QVariant RWScanImageModel::headerData(int section, Qt::Orientation orientation, 
 //=================================================================================================================
 QDataStream& operator<<( QDataStream &stream, const RWScanImageModel &model )
 {
-  stream << *model.m_pImageList;
+  stream << model.m_imageList;
 
   return stream;
 }
@@ -126,18 +129,18 @@ QDataStream& operator<<( QDataStream &stream, const RWScanImageModel &model )
 //=================================================================================================================
 QDataStream& operator>>( QDataStream &stream, RWScanImageModel &model )
 {
-  if( !model.m_pImageList->isEmpty() )
+  if( !model.m_imageList.empty() )
   {
-    model.beginRemoveRows( QModelIndex(), 0, model.m_pImageList->count() - 1 );
-    model.m_pImageList->clear();
+    model.beginRemoveRows( QModelIndex(), 0, (int) model.m_imageList.size() - 1 );
+    model.m_imageList.clear();
     model.endRemoveRows();
   }
 
-  stream >> *model.m_pImageList;
+  stream >> model.m_imageList;
 
-  if( !model.m_pImageList->isEmpty() )
+  if( !model.m_imageList.empty() )
   {
-    model.beginInsertRows( QModelIndex(), 0, model.m_pImageList->count() - 1 );
+    model.beginInsertRows( QModelIndex(), 0, (int) model.m_imageList.size() - 1 );
     model.endInsertRows();
   }
 

@@ -188,23 +188,27 @@ void RWScanRect::updateImage(const QModelIndex &index)
     return;
   }
 
-  const auto &image = m_pProject->imageModel().entry( index );
+  const auto &image = m_pProject->imageModel().itemAt( index );
+  if( !image )
+  {
+    return;
+  }
 
-  if( image.image().isNull() )
+  if( image->image().isNull() )
   {
     ui->imagePropertyL->setText( QString( "Bild: %1\nDatei nicht vorhanden oder unbekanntes Format." )
-      .arg( image.name() ) );
+      .arg( image->name() ) );
     ui->rawImageL->setPixmap( QPixmap() );
   }
   else
   {
     ui->imagePropertyL->setText( QString( "Bild: %1\nGröße: %2 x %3\nOriginal: %4mm x %5mm\nRotation: %6°" )
-      .arg( image.name() ).arg( image.image().width() ).arg( image.image().height() )
-      .arg( image.initialWidth_mm() ).arg( image.initialHeight_mm() ).arg( image.initialRotation_deg() ) );
+      .arg( image->name() ).arg( image->image().width() ).arg( image->image().height() )
+      .arg( image->initialWidth_mm() ).arg( image->initialHeight_mm() ).arg( image->initialRotation_deg() ) );
 
-    QTransform rotation = QTransform().rotate( image.initialRotation_deg() );
+    QTransform rotation = QTransform().rotate( image->initialRotation_deg() );
     QTransform scale    = rotation.scale( m_currentRawImageScale, m_currentRawImageScale );
-    ui->rawImageL->setPixmap( QPixmap::fromImage( image.image().transformed( scale ) ) );
+    ui->rawImageL->setPixmap( QPixmap::fromImage( image->image().transformed( scale ) ) );
   }
 }
 
@@ -226,8 +230,6 @@ void RWScanRect::projectChanged()
 
   connect( m_pProject.get(), &RWScanProject::modifiedChanged, this, &QWidget::setWindowModified );
   connect( m_pProject.get(), &RWScanProject::filenameChanged, this, &RWScanRect::updateTitle );
-
-  //connect( ui->imageAddPB, &QAbstractButton::clicked, m_pProject.get(), &RWScanProject::addImages );
 }
 
 

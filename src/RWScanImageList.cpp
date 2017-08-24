@@ -38,10 +38,10 @@ RWScanImageList::RWScanImageList()
 //=================================================================================================================
 QDataStream& operator<<( QDataStream &stream, const RWScanImageList &list )
 {
-  stream << list.count();
-  for( int i = 0; i < list.count(); i++ )
+  stream << (int) list.size();
+  for( const auto &entry : list )
   {
-    stream << list.at( i );
+    stream << *entry;
   }
 
   return stream;
@@ -57,9 +57,9 @@ QDataStream& operator>>( QDataStream &stream, RWScanImageList &list )
   stream >> count;
   for( int i = 0; i < count; i++ )
   {
-    RWScanImageEntry entry;
-    stream >> entry;
-    list.append( entry );
+    auto entry = new RWScanImageEntry;
+    stream >> *entry;
+    list.push_back( std::shared_ptr<RWScanImageEntry>( entry ) );
   }
 
   return stream;

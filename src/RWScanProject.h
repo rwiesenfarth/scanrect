@@ -58,7 +58,6 @@ class RWScanProject : public QObject
 
   public slots:
     void imageModelModified();
-    //void addImages();
 
   signals:
     void modifiedChanged( bool modified );

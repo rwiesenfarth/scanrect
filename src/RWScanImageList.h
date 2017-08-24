@@ -32,14 +32,16 @@
 #include <QtCore/QList>
 #include "RWScanImageEntry.h"
 
+#include <vector>
+#include <memory>
 
-class RWScanImageList : public QList<RWScanImageEntry>
+
+class RWScanImageList : public std::vector<std::shared_ptr<RWScanImageEntry>>
 {
   public:
     RWScanImageList();
 
   private:
-
     friend QDataStream& operator<<( QDataStream &stream, const RWScanImageList &list );
     friend QDataStream& operator>>( QDataStream &stream, RWScanImageList &list );
 };

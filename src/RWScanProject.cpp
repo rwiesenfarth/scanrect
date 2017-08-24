@@ -152,13 +152,6 @@ void RWScanProject::imageModelModified()
 
 
 //=================================================================================================================
-//void RWScanProject::addImages()
-//{
-//  setModified( true );
-//}
-
-
-//=================================================================================================================
 void RWScanProject::setModified( bool modified )
 {
   if( m_modified != modified )

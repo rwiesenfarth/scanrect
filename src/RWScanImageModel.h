@@ -29,13 +29,14 @@
 
 #pragma once
 
+#include "RWScanImageList.h"
+
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QDataStream>
 #include <QtGui/QBrush>
 #include <QtGui/QFont>
 
-class RWScanImageList;
-class RWScanImageEntry;
+#include <memory>
 
 
 class RWScanImageModel : public QAbstractListModel
@@ -43,7 +44,7 @@ class RWScanImageModel : public QAbstractListModel
   public:
     RWScanImageModel( QObject *parent = 0 );
 
-    const RWScanImageEntry &entry( const QModelIndex &index ) const;
+    std::shared_ptr<RWScanImageEntry> itemAt( const QModelIndex &index ) const;
 
     void addImages( const QStringList &imageList );
 
@@ -53,7 +54,7 @@ class RWScanImageModel : public QAbstractListModel
     QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const override;
 
   private:
-    RWScanImageList *m_pImageList;
+    RWScanImageList m_imageList;
 
     friend QDataStream& operator<<( QDataStream &stream, const RWScanImageModel &model );
     friend QDataStream& operator>>( QDataStream &stream, RWScanImageModel &model );
