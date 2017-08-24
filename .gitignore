@@ -31,3 +31,5 @@ _ReSharper*/
 #Nuget packages folder
 packages/
 /build-release
+/build-debug
+/build-profile
