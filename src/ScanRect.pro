@@ -18,14 +18,16 @@ SOURCES += \
     RWScanProject.cpp \
     RWScanImageEntry.cpp \
     RWScanImageList.cpp \
-    RWScanImageModel.cpp
+    RWScanImageModel.cpp \
+    RWScanDocumentEntry.cpp
 
 HEADERS  += \
     RWScanRect.h \
     RWScanProject.h \
     RWScanImageEntry.h \
     RWScanImageList.h \
-    RWScanImageModel.h
+    RWScanImageModel.h \
+    RWScanDocumentEntry.h
 
 FORMS    += \
     RWScanRect.ui
