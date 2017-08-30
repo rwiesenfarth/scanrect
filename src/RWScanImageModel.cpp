@@ -43,13 +43,13 @@ RWScanImageModel::RWScanImageModel( QObject *parent )
 
 
 //=================================================================================================================
-std::shared_ptr<RWScanImageEntry> RWScanImageModel::itemAt( const QModelIndex &index ) const
+std::weak_ptr<RWScanImageEntry> RWScanImageModel::itemAt( const QModelIndex &index ) const
 {
   if( index.isValid() && ( index.column() == 0 ) && ( index.row() <= m_imageList.size() ) )
   {
     return m_imageList.at( index.row() );
   }
-  return std::shared_ptr<RWScanImageEntry>();
+  return std::weak_ptr<RWScanImageEntry>();
 }
 
 

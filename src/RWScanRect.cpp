@@ -188,7 +188,7 @@ void RWScanRect::updateImage(const QModelIndex &index)
     return;
   }
 
-  const auto &image = m_pProject->imageModel().itemAt( index );
+  auto image = m_pProject->imageModel().itemAt( index ).lock();
   if( !image )
   {
     return;

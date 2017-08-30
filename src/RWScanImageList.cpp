@@ -36,6 +36,17 @@ RWScanImageList::RWScanImageList()
 
 
 //=================================================================================================================
+std::weak_ptr<RWScanImageEntry> RWScanImageList::findEntry(const QString &name)
+{
+  auto it = std::find_if( begin(), end(), [name]( const std::shared_ptr<RWScanImageEntry> &elem ) -> bool {
+    return ( elem && ( elem->name() == name ) );
+  } );
+
+  return ( it == end() ) ? std::weak_ptr<RWScanImageEntry>() : *it;
+}
+
+
+//=================================================================================================================
 QDataStream& operator<<( QDataStream &stream, const RWScanImageList &list )
 {
   stream << (int) list.size();

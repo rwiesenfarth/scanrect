@@ -44,7 +44,7 @@ class RWScanImageModel : public QAbstractListModel
   public:
     RWScanImageModel( QObject *parent = 0 );
 
-    std::shared_ptr<RWScanImageEntry> itemAt( const QModelIndex &index ) const;
+    std::weak_ptr<RWScanImageEntry> itemAt( const QModelIndex &index ) const;
 
     void addImages( const QStringList &imageList );
 
