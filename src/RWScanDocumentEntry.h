@@ -29,9 +29,29 @@
 
 #pragma once
 
+#include "RWScanImageEntry.h"
+
+#include <QtCore/QString>
+
+#include <memory>
+#include <vector>
+
+class RWScanImageList;
+
 
 class RWScanDocumentEntry
 {
   public:
-    RWScanDocumentEntry();
+    RWScanDocumentEntry( const QString &documentName );
+    RWScanDocumentEntry( QDataStream &stream, const RWScanImageList &imageList, int version = 0 );
+    RWScanDocumentEntry( const RWScanDocumentEntry & ) = delete;
+
+    RWScanDocumentEntry operator=( const RWScanDocumentEntry & ) = delete;
+
+    void save( QDataStream &stream ) const;
+    const std::vector<std::weak_ptr<RWScanImageEntry>> &images() const;
+
+  private:
+    QString                                      m_name;
+    std::vector<std::weak_ptr<RWScanImageEntry>> m_images;
 };

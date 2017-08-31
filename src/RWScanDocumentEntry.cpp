@@ -28,8 +28,60 @@
  **/
 
 #include "RWScanDocumentEntry.h"
+#include "RWScanImageList.h"
 
-RWScanDocumentEntry::RWScanDocumentEntry()
+
+//=================================================================================================================
+RWScanDocumentEntry::RWScanDocumentEntry( const QString &documentName )
+  : m_name( documentName )
+  , m_images()
+{ }
+
+
+//=================================================================================================================
+RWScanDocumentEntry::RWScanDocumentEntry( QDataStream &stream,
+  const RWScanImageList &imageList, int version )
+  : m_name()
+  , m_images()
 {
+  size_t  count = 0;
+  bool    imagePresent;
+  QString imageName;
 
+  //! \todo Check magic number to avoid bad reads
+  //! \todo Add versioned read
+  stream >> m_name;
+  stream >> count;
+  for( size_t i = 0; i < count; i++ )
+  {
+    stream >> imagePresent;
+    if( imagePresent )
+    {
+      stream >> imageName;
+      m_images.push_back( imageList.findEntry( imageName ) );
+    }
+  }
+}
+
+
+//=================================================================================================================
+void RWScanDocumentEntry::save( QDataStream &stream ) const
+{
+  //! \todo Add magic number to avoid bad reads
+  stream << m_name;
+  stream << m_images.size();
+  for( const auto &image : m_images )
+  {
+    auto locked = image.lock();
+
+    if( locked )
+    {
+      stream << true;
+      stream << locked->name();
+    }
+    else
+    {
+      stream << false;
+    }
+  }
 }
