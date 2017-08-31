@@ -40,34 +40,45 @@ RWScanDocumentEntry::RWScanDocumentEntry( const QString &documentName )
 
 //=================================================================================================================
 RWScanDocumentEntry::RWScanDocumentEntry( QDataStream &stream,
-  const RWScanImageList &imageList, int version )
+  const RWScanImageList &imageList, quint32 version )
   : m_name()
   , m_images()
 {
-  size_t  count = 0;
-  bool    imagePresent;
-  QString imageName;
+  quint32 magic;
 
-  //! \todo Check magic number to avoid bad reads
-  //! \todo Add versioned read
-  stream >> m_name;
-  stream >> count;
-  for( size_t i = 0; i < count; i++ )
+  stream >> magic;
+  if( magic == s_magic )
   {
-    stream >> imagePresent;
-    if( imagePresent )
+    size_t  count = 0;
+    bool    imagePresent;
+    QString imageName;
+
+    stream >> m_name;
+    stream >> count;
+    for( size_t i = 0; i < count; i++ )
     {
-      stream >> imageName;
-      m_images.push_back( imageList.findEntry( imageName ) );
+      stream >> imagePresent;
+      if( imagePresent )
+      {
+        stream >> imageName;
+        m_images.push_back( imageList.findEntry( imageName ) );
+      }
     }
   }
 }
 
 
 //=================================================================================================================
+bool RWScanDocumentEntry::valid() const
+{
+  return !m_name.isEmpty();
+}
+
+
+//=================================================================================================================
 void RWScanDocumentEntry::save( QDataStream &stream ) const
 {
-  //! \todo Add magic number to avoid bad reads
+  stream << s_magic;
   stream << m_name;
   stream << m_images.size();
   for( const auto &image : m_images )

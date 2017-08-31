@@ -43,15 +43,18 @@ class RWScanDocumentEntry
 {
   public:
     RWScanDocumentEntry( const QString &documentName );
-    RWScanDocumentEntry( QDataStream &stream, const RWScanImageList &imageList, int version = 0 );
+    RWScanDocumentEntry( QDataStream &stream, const RWScanImageList &imageList, quint32 version = 0 );
     RWScanDocumentEntry( const RWScanDocumentEntry & ) = delete;
 
     RWScanDocumentEntry operator=( const RWScanDocumentEntry & ) = delete;
 
+    bool valid() const;
     void save( QDataStream &stream ) const;
     const std::vector<std::weak_ptr<RWScanImageEntry>> &images() const;
 
   private:
     QString                                      m_name;
     std::vector<std::weak_ptr<RWScanImageEntry>> m_images;
+
+    static constexpr quint32 s_magic = 0x7d2a9216;
 };
