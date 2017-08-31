@@ -39,9 +39,9 @@ class RWScanImageEntry
   public:
     RWScanImageEntry();
     RWScanImageEntry( const QString &filename );
-    RWScanImageEntry( const RWScanImageEntry & ) = default;
+    RWScanImageEntry( const RWScanImageEntry & ) = delete;
 
-    RWScanImageEntry &operator=( const RWScanImageEntry & ) = default;
+    RWScanImageEntry &operator=( const RWScanImageEntry & ) = delete;
 
     //! \brief The (complete) filename of the image
     QString filename() const;
