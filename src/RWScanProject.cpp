@@ -189,6 +189,7 @@ QDataStream& operator>>( QDataStream &stream, RWScanProject &project )
 
   stream >> version;
 
+  //! \todo Add handling of versioned read for project and the contained elements
   if( version == RWScanProject::s_version_001 )
   {
     project.m_valid =true;

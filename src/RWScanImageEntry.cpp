@@ -154,6 +154,7 @@ void RWScanImageEntry::setDefaultHeight_mm(int value)
 //=================================================================================================================
 QDataStream& operator<<( QDataStream &stream, const RWScanImageEntry &entry )
 {
+  //! \todo Add magic number to avoid bad reads
   stream << entry.m_filename;
   stream << entry.m_initialRotation_deg;
   stream << entry.m_initialWidth_mm;
@@ -166,6 +167,8 @@ QDataStream& operator<<( QDataStream &stream, const RWScanImageEntry &entry )
 //=================================================================================================================
 QDataStream& operator>>( QDataStream &stream, RWScanImageEntry &entry )
 {
+  //! \todo Check magic number to avoid bad reads
+  //! \todo Add versioned read
   stream >> entry.m_filename;
   stream >> entry.m_initialRotation_deg;
   stream >> entry.m_initialWidth_mm;
