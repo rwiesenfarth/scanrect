@@ -36,7 +36,6 @@
 #include <memory>
 
 
-//! \todo Inherit from std::map<std::string, std::shared_ptr<RWScanImageEntry>> for fast search?
 class RWScanImageList : public std::vector<std::shared_ptr<RWScanImageEntry>>
 {
   public:
