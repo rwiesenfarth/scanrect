@@ -120,7 +120,7 @@ QVariant RWScanImageModel::headerData(int section, Qt::Orientation orientation, 
 //=================================================================================================================
 QDataStream& operator<<( QDataStream &stream, const RWScanImageModel &model )
 {
-  stream << model.m_imageList;
+  model.m_imageList.save( stream );
 
   return stream;
 }
@@ -136,9 +136,9 @@ QDataStream& operator>>( QDataStream &stream, RWScanImageModel &model )
     model.endRemoveRows();
   }
 
-  stream >> model.m_imageList;
+  model.m_imageList = RWScanImageList( stream, version );
 
-  if( !model.m_imageList.empty() )
+  if( model.m_imageList.valid() && !model.m_imageList.empty() )
   {
     model.beginInsertRows( QModelIndex(), 0, (int) model.m_imageList.size() - 1 );
     model.endInsertRows();

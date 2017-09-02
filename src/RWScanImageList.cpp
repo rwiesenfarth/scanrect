@@ -32,46 +32,79 @@
 
 //=================================================================================================================
 RWScanImageList::RWScanImageList()
+  : m_valid( true )
 { }
 
 
 //=================================================================================================================
-std::weak_ptr<RWScanImageEntry> RWScanImageList::findEntry(const QString &name)
+RWScanImageList::RWScanImageList(QDataStream &stream, quint32 version)
+{
+  clear();
+  m_valid = false;
+
+  size_t count = 0;
+
+  if( version == 1 )
+  {
+    // version 1 used int
+    int intCount;
+
+    stream >> intCount;
+    count = (size_t) intCount;
+  }
+  else
+  {
+    // version 2 adds magic numbers and uses size_t
+    quint32 magic;
+
+    stream >> magic;
+    if( magic != s_magic )
+    {
+      return;
+    }
+    stream >> count;
+  }
+
+  for( size_t i = 0; i < count; i++ )
+  {
+    auto entry = new RWScanImageEntry( stream, version );
+    if( entry->valid() )
+    {
+      push_back( std::shared_ptr<RWScanImageEntry>( entry ) );
+    }
+  }
+  m_valid = true;
+}
+
+
+//=================================================================================================================
+bool RWScanImageList::valid() const
+{
+  return m_valid;
+}
+
+
+//=================================================================================================================
+void RWScanImageList::save(QDataStream &stream)
+{
+  stream << s_magic;
+  stream << list.size();
+  for( const auto &entry : list )
+  {
+    if( entry->valid() )
+    {
+      entry->save( stream );
+    }
+  }
+}
+
+
+//=================================================================================================================
+std::weak_ptr<RWScanImageEntry> RWScanImageList::findEntry(const QString &name) const
 {
   auto it = std::find_if( begin(), end(), [name]( const std::shared_ptr<RWScanImageEntry> &elem ) -> bool {
     return ( elem && ( elem->name() == name ) );
   } );
 
   return ( it == end() ) ? std::weak_ptr<RWScanImageEntry>() : *it;
-}
-
-
-//=================================================================================================================
-QDataStream& operator<<( QDataStream &stream, const RWScanImageList &list )
-{
-  stream << (int) list.size();
-  for( const auto &entry : list )
-  {
-    stream << *entry;
-  }
-
-  return stream;
-}
-
-
-//=================================================================================================================
-QDataStream& operator>>( QDataStream &stream, RWScanImageList &list )
-{
-  int count;
-
-  list.clear();
-  stream >> count;
-  for( int i = 0; i < count; i++ )
-  {
-    auto entry = new RWScanImageEntry;
-    stream >> *entry;
-    list.push_back( std::shared_ptr<RWScanImageEntry>( entry ) );
-  }
-
-  return stream;
 }

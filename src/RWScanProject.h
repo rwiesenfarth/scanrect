@@ -79,8 +79,7 @@ class RWScanProject : public QObject
     RWScanImageModel m_imageModel;
 
     static constexpr quint64 s_magic          = 0xa7fe3901b5224098;
-    static constexpr quint32 s_version_001    = 1;
-    static constexpr quint32 s_currentVersion = s_version_001;
+    static constexpr quint32 s_currentVersion = 2;
 };
 
 

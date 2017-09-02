@@ -38,16 +38,6 @@ int RWScanImageEntry::s_defaultHeight_mm    = 297;
 
 
 //=================================================================================================================
-RWScanImageEntry::RWScanImageEntry()
-  : m_filename()
-  , m_image()
-  , m_initialRotation_deg( defaultRotation_deg() )
-  , m_initialWidth_mm( defaultWidth_mm() )
-  , m_initialHeight_mm( defaultHeight_mm() )
-{ }
-
-
-//=================================================================================================================
 RWScanImageEntry::RWScanImageEntry(const QString &filename)
   : m_filename( filename )
   , m_image()
@@ -56,6 +46,54 @@ RWScanImageEntry::RWScanImageEntry(const QString &filename)
   , m_initialHeight_mm( defaultHeight_mm() )
 {
   initImage();
+}
+
+
+//=================================================================================================================
+RWScanImageEntry::RWScanImageEntry(QDataStream &stream, quint32 version)
+  : m_filename()
+  , m_image()
+  , m_initialRotation_deg( 0. )
+  , m_initialWidth_mm( 0. )
+  , m_initialHeight_mm( 0. )
+{
+  // version 2 adds magic numbers
+  if( version > 1 )
+  {
+    quint32 magic;
+
+    stream >> magic;
+    if( magic != s_magic )
+    {
+      return;
+    }
+  }
+
+  stream >> m_filename;
+  stream >> m_initialRotation_deg;
+  stream >> m_initialWidth_mm;
+  stream >> m_initialHeight_mm;
+
+  initImage();
+}
+
+
+//=================================================================================================================
+bool RWScanImageEntry::valid() const
+{
+  return !m_filename.isEmpty();
+}
+
+
+//=================================================================================================================
+void RWScanImageEntry::save(QDataStream &stream) const
+{
+  stream << s_magic;
+  stream << m_filename;
+  stream << m_initialRotation_deg;
+  stream << m_initialWidth_mm;
+  stream << m_initialHeight_mm;
+
 }
 
 
@@ -148,32 +186,4 @@ void RWScanImageEntry::setDefaultWidth_mm(int value)
 void RWScanImageEntry::setDefaultHeight_mm(int value)
 {
   s_defaultHeight_mm = value;
-}
-
-
-//=================================================================================================================
-QDataStream& operator<<( QDataStream &stream, const RWScanImageEntry &entry )
-{
-  //! \todo Add magic number to avoid bad reads
-  stream << entry.m_filename;
-  stream << entry.m_initialRotation_deg;
-  stream << entry.m_initialWidth_mm;
-  stream << entry.m_initialHeight_mm;
-
-  return stream;
-}
-
-
-//=================================================================================================================
-QDataStream& operator>>( QDataStream &stream, RWScanImageEntry &entry )
-{
-  //! \todo Check magic number to avoid bad reads
-  //! \todo Add versioned read
-  stream >> entry.m_filename;
-  stream >> entry.m_initialRotation_deg;
-  stream >> entry.m_initialWidth_mm;
-  stream >> entry.m_initialHeight_mm;
-
-  entry.initImage();
-  return stream;
 }

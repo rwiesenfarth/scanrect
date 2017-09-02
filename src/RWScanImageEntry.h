@@ -37,11 +37,14 @@
 class RWScanImageEntry
 {
   public:
-    RWScanImageEntry();
     RWScanImageEntry( const QString &filename );
+    RWScanImageEntry( QDataStream &stream, quint32 version = 0 );
     RWScanImageEntry( const RWScanImageEntry & ) = delete;
 
     RWScanImageEntry &operator=( const RWScanImageEntry & ) = delete;
+
+    bool valid() const;
+    void save( QDataStream &stream ) const;
 
     //! \brief The (complete) filename of the image
     QString filename() const;
@@ -77,9 +80,6 @@ class RWScanImageEntry
     //! \brief Initialize a freshly created image
     void initImage();
 
-    friend QDataStream& operator<<( QDataStream &stream, const RWScanImageEntry &entry );
-    friend QDataStream& operator>>( QDataStream &stream, RWScanImageEntry &entry );
-
     QString m_filename;
     QImage  m_image;
 
@@ -90,8 +90,6 @@ class RWScanImageEntry
     static int s_defaultRotation_deg;
     static int s_defaultWidth_mm;
     static int s_defaultHeight_mm;
+
+    static constexpr quint32 s_magic = 0x18fa6492;
 };
-
-
-QDataStream& operator<<( QDataStream &stream, const RWScanImageEntry &entry );
-QDataStream& operator>>( QDataStream &stream, RWScanImageEntry &entry );

@@ -40,14 +40,14 @@ class RWScanImageList : public std::vector<std::shared_ptr<RWScanImageEntry>>
 {
   public:
     RWScanImageList();
+    RWScanImageList( QDataStream &stream, quint32 version = 0 );
 
-    std::weak_ptr<RWScanImageEntry> findEntry( const QString &name );
+    bool valid() const;
+    void save( QDataStream &stream );
+    std::weak_ptr<RWScanImageEntry> findEntry( const QString &name ) const;
 
   private:
-    friend QDataStream& operator<<( QDataStream &stream, const RWScanImageList &list );
-    friend QDataStream& operator>>( QDataStream &stream, RWScanImageList &list );
+    bool m_valid;
+
+    static constexpr quint32 s_magic = 0x8a5ce234;
 };
-
-
-QDataStream& operator<<( QDataStream &stream, const RWScanImageList &list );
-QDataStream& operator>>( QDataStream &stream, RWScanImageList &list );
